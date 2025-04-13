@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IT's KOSTA - login</title>
+    <link rel="stylesheet" href="css/navbar.css" type="text/css" />
+    <link rel="stylesheet" href="css/common.css" type="text/css" />
+    <link rel="stylesheet" href="css/footer.css" type="text/css" />
+
+    <style>
+      #login {
+        padding: 20px 0px; /*상하 좌우 */
+      }
+
+      #login h1 {
+        text-align: center;
+        padding: 5px;
+      }
+
+      #login form {
+        height: 200px;
+        border: 1px solid gray;
+        padding: 40px;
+      }
+
+      #login .form-item {
+        margin-bottom: 10px;
+      }
+
+      #login .form-item label {
+        width: 100px;
+        display: inline-block;
+        font-size: 18px;
+      }
+
+      #login .form-item input {
+        font-size: 18px;
+        border: 1px skyblue solid;
+        width: 200px;
+      }
+
+      #login button {
+        float: right;
+        width: 80px;
+        font-size: 18px;
+        padding: 5px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="navbar">
+      <!-- 5개의 메뉴생성 -->
+      <ul>
+        <li class="nav-item logo">
+          <a href="index.html"
+            ><img src="images/logo.jpg" alt="로고입니다."
+          /></a>
+        </li>
+        <li class="nav-item"><a href="personal.html">개인</a></li>
+        <li class="nav-item"><a href="busines.html">기업</a></li>
+        <li class="nav-item"><a href="login.html">로그인</a></li>
+        <li class="nav-item"><a href="register.html">회원가입</a></li>
+      </ul>
+    </nav>
+
+    <div id="banner">지금 당신의 행복! IT's KOSTA Life!</div>
+
+    <div id="container">
+      <!-- navbar  추가 -->
+
+      <div id="login">
+        <h1>Login</h1>
+        <form action="" method="post">
+          <div class="form-item">
+            <label for="id">아이디</label>
+            <input type="text" id="id" name="id" />
+          </div>
+
+          <div class="form-item">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" />
+          </div>
+
+          <hr />
+          <button id="login-button">로그인</button>
+        </form>
+      </div>
+
+      <footer>
+        <ul>
+          <li>경기도 오리역 한국소프트웨어진흥협회</li>
+          <li>02-0000-0000</li>
+        </ul>
+      </footer>
+    </div>
+    <script>
+      document
+        .querySelector("form")
+        .addEventListener("submit", function (event) {
+          let idCheck = document.getElementById("id");
+          let passwordCheck = document.getElementById("password");
+          // 폼은 기본적으로 페이지를 새로고침하는데
+          // event.preventDefault()는 이 새로고침을 막아주며, 데이터 보호에 유용하다고 함
+          event.preventDefault();
+
+          if (!idCheck.value) {
+            alert("아이디를 입력해주세요.");
+            idCheck.focus(); // focus를 하면 입력되지 않은 곳에 들어감
+            event.preventDefault(); //전송기능 막음
+            return; // event.preventDefault(); 를 해주면 된다.
+          }
+          if (!passwordCheck.value) {
+            alert("비밀번호를 입력해주세요.");
+            passwordCheck.focus();
+            event.preventDefault(); //전송기능 막음
+            return;
+          }
+
+          alert("입력유무체크 완료");
+          this.submit();
+        });
+    </script>
+  </body>
+</html>

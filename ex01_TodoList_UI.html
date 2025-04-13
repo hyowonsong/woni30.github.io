@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="css/App.css" rel="stylesheet" />
+    <link href="css/Header.css" rel="stylesheet" />
+    <link href="css/Editor.css" rel="stylesheet" />
+    <link href="css/List.css" rel="stylesheet" />
+    <link href="css/TodoItem.css" rel="stylesheet" />
+    <title>document</title>
+  </head>
+  <body>
+    <div class="App">
+      <div class="Header">
+        <h3>오늘의 Plan 😊</h3>
+        <h1 id="today"></h1>
+      </div>
+
+      <form>
+        <div class="Editor">
+          <input type="text" placeholder="새로운 todo" />
+          <button>추가</button>
+        </div>
+      </form>
+
+      <div class="List">
+        <h4>Todo List 🌴</h4>
+        <input type="text" id="keyword" placeholder="검색어를 입력해주세요." />
+
+        <div class="todos_wrapper"></div>
+      </div>
+    </div>
+
+    <script>
+      let mockData = [
+        {
+          id: 0,
+          isDone: false,
+          content: "React study",
+          date: new Date().getTime(),
+        },
+        {
+          id: 1,
+          isDone: true,
+          content: "친구만나기",
+          date: new Date().getTime(),
+        },
+        {
+          id: 2,
+          isDone: false,
+          content: "낮잠자기",
+          date: new Date().getTime(),
+        },
+      ];
+
+      let day = ["일", "월", "화", "수", "목", "금", "토"];
+
+      // 1. 페이지가 로드될 때 onload 이벤트가 발생합니다.(현재 날짜)
+      onload = () => {
+        initData(mockData); // 초기 화면에 todo 리스트 출력
+
+        const today = new Date(); // 날짜와 시간을 다루기 위한 내장 객체
+        // today.getFullYear()만 하면 숫자를 반환합니다. slice는 문자열, 배열에만 사용가능해 String
+        const year = String(today.getFullYear()).slice(2); // 2025 → '25'
+        const month = today.getMonth() + 1;
+        const date = today.getDate();
+        // Date 객체의 getDay() 메서드는 현재 날짜의 요일을 숫자로 반환
+        const dayStr = day[today.getDay()];
+
+        const todayStr = `${year}년 ${month}월 ${date}일 ${dayStr}요일`;
+        document.getElementById("today").innerText = todayStr;
+      };
+
+      // 2. 전체 출력 기능(initData 함수)
+      // initData는 printData(즉, mockData)를 받아 배열의 각 todo 객체를 처리.
+      const initData = (printData) => {
+        const wrapper = document.querySelector(".todos_wrapper"); // 출력할 위치를 선택
+        wrapper.innerHTML = ""; // 기존 목록을 비워줍니다.
+
+        // mockData안의 각 객체를 하나씩 돌아봅니다.
+        printData.forEach((todo) => {
+          // "밀리초(ms)" 단위로 나타낸 숫자 timeStap를 Date 객체를 이용해 날짜로 바꿔줍니다.
+          // 1746126600000 이렇게 나오는 것을 Date 객체로 변환해 날짜/시간 정보를 추출
+          const dateObj = new Date(todo.date);
+
+          const year = dateObj.getFullYear(); // 날짜 객체에서 연도(예: 2025)를 추출
+          const month = dateObj.getMonth() + 1; // getMonth()는 0부터 시작하는 월을 반환해 +1 해주기
+          const date = dateObj.getDate();
+          const dayStr = day[dateObj.getDay()]; // getDay()는 요일을 숫자로 반환합니다. (0: 일요일, 1: 월요일, ..., 6: 토요일)
+
+          let hour = dateObj.getHours(); // 시간을 24시간제 기준으로 가져옵니다. (0~23)
+          // getMinutes()와 getSeconds()로 분과 초를 가져옵니다.
+          // padStart(2, "0")는 한 자리 숫자일 때 앞에 0을 붙여서 두 자리로 만들어줍니다
+          const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+          const seconds = String(dateObj.getSeconds()).padStart(2, "0");
+
+          const ampm = hour < 12 ? "오전" : "오후";
+          // 12시간제 표기로 바꾸기 위한 코드
+          hour = hour % 12 === 0 ? 12 : hour % 12;
+
+          // 지금까지 만든 날짜/시간 정보를 하나의 문자열로 조합해 표시용 형식을 만듭니다.
+          const viewDate = `${year}.${month}.${date}. ${ampm} ${hour}:${minutes}:${seconds}`;
+
+          const todoEl = `
+            <div class="TodoItem">
+                <input type="checkbox" onchange="onUpdate(${todo.id})" ${
+            todo.isDone ? "checked" : ""
+          } />
+                <div class="content">${todo.content}</div>
+                <div class="date">${viewDate}</div>
+                <button class="button" name="del" value="${
+                  todo.id
+                }" onclick="todoDel(this)">삭제</button>
+            </div>`;
+
+          // 완성된 todoEl HTML 문자열을 기존 wrapper 요소의 innerHTML에 추가
+          wrapper.innerHTML += todoEl;
+        });
+      };
+
+      // 3. 추가 기능
+
+      let idIndex = 3;
+      // 자식 선택자는 직접적인 자식 요소를 선택하는데 사용되며 그 외는 선택되지 않습니다.
+      document.querySelector(".Editor > button").onclick = (event) => {
+        event.preventDefault(); // 기본 폼 제출 동작 막는 역할
+
+        const input = document.querySelector(".Editor > input");
+        // input.value는 사용자가 입력한 값을 가져오며 trim은 앞 뒤 공백을 제거합니다.
+        const content = input.value.trim();
+
+        if (content === "") {
+          alert("내용을 입력해주세요.");
+          return;
+        }
+
+        // 새로운 할 일 객체를 생성합니다.
+        const newTodo = {
+          id: idIndex++, // 고유한 아이디를 부여합니다.
+          isDone: false, // 새로 추가된 할 일은 기본적으로 미완료 상태
+          content: content, // 사용자가 입력한 내용을 content 속성에 저장
+          date: new Date().getTime(), // 현재 시간을 date 속성에 저장
+        };
+
+        mockData.push(newTodo); // 배열에 추가
+        input.value = ""; // 입력창 비우기
+        initData(mockData); // 화면 다시 그리기
+      };
+
+      // 수정 기능 -> mockData 배열을 변경된 새 배열로 매핑
+      const onUpdate = (targetId) => {
+        mockData = mockData.map((todo) =>
+          todo.id === targetId ? { ...todo, isDone: !todo.isDone } : todo
+        );
+        initData(mockData); // 수정된 mockData 배열을 기반으로 화면을 다시 출력
+      };
+
+      // 삭제 기능
+      const todoDel = (th) => {
+        const id = Number(th.value); // 삭제할 id
+        mockData = mockData.filter((todo) => todo.id !== id); // 해당 id 제외하고 필터링
+        initData(mockData); // 다시 출력
+      };
+
+      // 검색 기능
+      // id가 keyword인 input 요소를 선택
+      // .onkeyup: 사용자가 키보드를 눌렀다가 뗐을 때(keyup 이벤트)에 실행될 함수를 등록
+      // getFilterData(...): 이 검색어를 인자로 전달해서 mockData를 필터링하는 함수를 실행
+      // searchedTodos: 필터링된 결과(검색에 해당하는 todo 항목들)를 저장
+      document.querySelector("#keyword").onkeyup = (e) => {
+        const searchedTodos = getFilterData(e.target.value);
+        initData(searchedTodos);
+      };
+
+      // search: 사용자가 입력한 검색어가 이 함수에 전달
+      // 검색어가 공백이면 전체 반환
+      // (todo) => todo.content.includes(...): 각 todo 항목의 content 속성(할 일 내용)이 검색어를 포함하고 있는지 검사
+      const getFilterData = (search) => {
+        if (search.trim() === "") return mockData;
+        return mockData.filter((todo) => todo.content.includes(search.trim()));
+      };
+    </script>
+  </body>
+</html>
